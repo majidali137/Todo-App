@@ -1,5 +1,8 @@
 let express = require('express')
 let mongodb = require("mongodb")
+let sanitizeHTML = require("sanitize-html")
+
+
 let app = express()
 const cluster = require("cluster")
 const {json} = require("express");
@@ -15,7 +18,21 @@ mongodb.connect(connectionString, {useNewUrlParser: true, useUnifiedTopology: tr
 app.use(express.json())
 app.use(express.urlencoded({extended:false}))
 
-app.get('/', function(req, res){
+
+function passwordProtected(req,res,next){
+   res.set("WWW-Authenticate","Basic realm='Simple Todo App'")
+    console.log(req.headers.authorization)
+    if(req.headers.authorization == "Basic dG9kb2FwcDp0b2RvYXBwQG5vZGUuanM=") {
+        next()
+    }
+    else {
+        res.status(401).send("Authentication required")
+
+    }
+}
+app.use( passwordProtected)
+
+app.get('/',  function(req, res){
     db.collection('items').find().toArray(function (err, items){
         res.send(`<!DOCTYPE html>
 <html>
@@ -55,14 +72,16 @@ let items = ${JSON.stringify(items)}
 
 })
 app.post("/create-item",function (req, res) {
-   db.collection("items").insertOne({text:req.body.text}, function (err,info){
+    let safeText = sanitizeHTML(req.body.text, {allowedTags: [], allowedAttributes: {}})
+   db.collection("items").insertOne({text: safeText}, function (err, info){
       res.json(info.ops[0])
    })
 
 })
 
 app.post('/update-item',function (req,res) {
-    db.collection('items').findOneAndUpdate({_id: new mongodb.ObjectId(req.body.id) },{$set:{text:req.body.text}},function(){
+     let safeText = sanitizeHTML(req.body.text, {allowedTags: [], allowedAttributes: {}})
+    db.collection('items').findOneAndUpdate({_id: new mongodb.ObjectId(req.body.id) },{$set:{text: safeText}},function(){
         res.send("Success")
     })
 })
