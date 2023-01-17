@@ -71,6 +71,7 @@ let items = ${JSON.stringify(items)}
     })
 
 })
+
 app.post("/create-item",function (req, res) {
     let safeText = sanitizeHTML(req.body.text, {allowedTags: [], allowedAttributes: {}})
    db.collection("items").insertOne({text: safeText}, function (err, info){

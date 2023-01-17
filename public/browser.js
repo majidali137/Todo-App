@@ -17,15 +17,23 @@ let ourHTML = items.map(function (item){
 let createField = document.getElementById("create-field")
 document.getElementById("create-form").addEventListener("submit", function (e) {
     e.preventDefault()
-      axios.post( '/create-item',{ text: createField.value}).then(function (response) {
+
+    if (createField.value !== ""){
+      axios.post( '/create-item',{ text: createField.value }).then(function (response) {
             // Create the html for a new item
+
+
             document.getElementById("item-list").insertAdjacentHTML("beforeend" , itemTemplate(response.data))
           createField.value = ""
           createField.focus()
+
         }).catch(function () {
             console.log("please try again later.")
         })
-
+}
+    else {
+        alert("Enter Todo item name")
+    }
 })
 
 document.addEventListener("click", function (e){
