@@ -3,6 +3,7 @@ let mongodb = require("mongodb")
 let sanitizeHTML = require("sanitize-html")
 
 
+
 let app = express()
 const cluster = require("cluster")
 const {json} = require("express");
@@ -32,7 +33,7 @@ function passwordProtected(req,res,next){
 }
 app.use( passwordProtected)
 
-app.get('/',  function(req, res){
+app.get('/',function(req, res){
     db.collection('items').find().toArray(function (err, items){
         res.send(`<!DOCTYPE html>
 <html>
@@ -72,17 +73,43 @@ let items = ${JSON.stringify(items)}
 
 })
 
+Todaydate = new Date()
+
 app.post("/create-item",function (req, res) {
     let safeText = sanitizeHTML(req.body.text, {allowedTags: [], allowedAttributes: {}})
-   db.collection("items").insertOne({text: safeText}, function (err, info){
+   db.collection("items").insertOne({text: safeText,
+
+       date: formatDate(Todaydate)
+
+   }, function (err, info){
       res.json(info.ops[0])
    })
 
 })
 
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2)
+        month = '0' + month;
+    if (day.length < 2)
+        day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+
+console.log(formatDate('Sun May 11,2014'));
+
 app.post('/update-item',function (req,res) {
      let safeText = sanitizeHTML(req.body.text, {allowedTags: [], allowedAttributes: {}})
-    db.collection('items').findOneAndUpdate({_id: new mongodb.ObjectId(req.body.id) },{$set:{text: safeText}},function(){
+    db.collection('items').findOneAndUpdate({_id: new mongodb.ObjectId(req.body.id) },{$set:{
+        text: safeText,date: new Date()
+
+
+    }},function(){
         res.send("Success")
     })
 })
