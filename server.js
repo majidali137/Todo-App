@@ -79,7 +79,7 @@ app.post("/create-item",function (req, res) {
     let safeText = sanitizeHTML(req.body.text, {allowedTags: [], allowedAttributes: {}})
    db.collection("items").insertOne({text: safeText,
 
-       date: formatDate(Todaydate)
+       date: new Date()
 
    }, function (err, info){
       res.json(info.ops[0])
@@ -87,19 +87,19 @@ app.post("/create-item",function (req, res) {
 
 })
 
-function formatDate(date) {
-    var d = new Date(date),
-        month = '' + (d.getMonth() + 1),
-        day = '' + d.getDate(),
-        year = d.getFullYear();
-
-    if (month.length < 2)
-        month = '0' + month;
-    if (day.length < 2)
-        day = '0' + day;
-
-    return [year, month, day].join('-');
-}
+// function formatDate(date) {
+//     var d = new Date(date),
+//         month = '' + (d.getMonth() + 1),
+//         day = '' + d.getDate(),
+//         year = d.getFullYear();
+//
+//     if (month.length < 2)
+//         month = '0' + month;
+//     if (day.length < 2)
+//         day = '0' + day;
+//
+//     return [year, month, day].join('-');
+// }
 
 console.log(formatDate('Sun May 11,2014'));
 
