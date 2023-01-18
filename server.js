@@ -73,7 +73,7 @@ let items = ${JSON.stringify(items)}
 
 })
 
-Todaydate = new Date()
+// Todaydate = new Date()
 
 app.post("/create-item",function (req, res) {
     let safeText = sanitizeHTML(req.body.text, {allowedTags: [], allowedAttributes: {}})
@@ -100,8 +100,6 @@ app.post("/create-item",function (req, res) {
 //
 //     return [year, month, day].join('-');
 // }
-
-console.log(formatDate('Sun May 11,2014'));
 
 app.post('/update-item',function (req,res) {
      let safeText = sanitizeHTML(req.body.text, {allowedTags: [], allowedAttributes: {}})
